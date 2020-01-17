@@ -34,7 +34,6 @@ function loadModels(urns) {
                 viewer.loadDocumentNode(doc, viewables,{
                     placementTransform: (new THREE.Matrix4()).setPosition(m.xform),
                     keepCurrentModels: true,
-                    extensions:["DragControlExtension"],
                     globalOffset: {x:0,y:0,z:0}
                 })
                 .then( onLoadFinished );
