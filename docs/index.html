@@ -11,29 +11,22 @@
 </body>
 
 <script src="https://xf79h9aa3l.execute-api.us-west-2.amazonaws.com/toolkit2/api/_adsk.js"></script>
-<script src=" https://developer.api.autodesk.com/modelderivative/v2/viewers/7.4/viewer3D.js"></script>
+<script src="https://developer.api.autodesk.com/modelderivative/v2/viewers/7.*/viewer3D.js"></script>
 
 <script>
 let viewer = null;
-
-
-function onGestureEnd() {
-    var hitTest = viewer.clientToWorld(window.innerWidth/2, window.innerHeight/2, true);
-    viewer.navigation.setPivotPoint(hitTest.point);
-}
 
 function loadModels(urns) {
 
     const viewerOptions = {
         env: 'AutodeskProduction',
         accessToken: _adsk.token.access_token,
-        extensions:[ ]
     };
 
     Autodesk.Viewing.Initializer(viewerOptions, () => {
 
         const div = document.getElementById('forgeViewer');
-        viewer = new Autodesk.Viewing.Private.GuiViewer3D(div);
+        viewer = new Autodesk.Viewing.Private.GuiViewer3D(div, {extensions:["DragControlExtension"]});
         viewer.start();
         urns.map((m)=>{
             Autodesk.Viewing.Document.load(`urn:${m.urn}`, (doc) => {
@@ -41,6 +34,8 @@ function loadModels(urns) {
                 viewer.loadDocumentNode(doc, viewables,{
                     placementTransform: (new THREE.Matrix4()).setPosition(m.xform),
                     keepCurrentModels: true,
+                    extensions:["DragControlExtension"],
+                    globalOffset: {x:0,y:0,z:0}
                 })
                 .then( onLoadFinished );
             });
@@ -50,15 +45,19 @@ function loadModels(urns) {
 
     function onLoadFinished(doc) {
         console.log('loaded');
-        viewer.restoreState({"objectSet":[{"id":[],"idType":"lmv","seedUrn":"dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTIvcnN0X2Jhc2ljX3NhbXBsZV9wcm9qZWN0LnJ2dA","isolated":[],"hidden":[],"explodeScale":0},{"id":[],"idType":"lmv","seedUrn":"dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTEvcmFjLnJ2dA","isolated":[],"hidden":[],"explodeScale":0},{"id":[],"idType":"lmv","seedUrn":"dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTEvcmFjLnJ2dA","isolated":[],"hidden":[],"explodeScale":0},{"id":[],"idType":"lmv","seedUrn":"dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTIvNDMyJTIwTmFwYS5ydnQ","isolated":[],"hidden":[],"explodeScale":0}],"viewport":{"name":"","eye":[-59.98282024314271,134.50257699040023,112.59353699642256],"target":[8.07193965294114,-7.138948287361842,8.139811791622051],"up":[0.23973816371841294,-0.49896405818220996,0.832802786678373],"worldUpVector":[0,0,1],"pivotPoint":[-14.72048231014081,9.215966849418464,15.333333015441895],"distanceToOrbit":164.21169495875102,"aspectRatio":1.820069204152249,"projection":"perspective","isOrthographic":false,"fieldOfView":49.217805132361256},"renderOptions":{"environment":"Boardwalk","ambientOcclusion":{"enabled":true,"radius":13.123359580052492,"intensity":1},"toneMap":{"method":1,"exposure":-7,"lightMultiplier":-1e-20},"appearance":{"ghostHidden":true,"ambientShadow":true,"antiAliasing":true,"progressiveDisplay":true,"swapBlackAndWhite":false,"displayLines":true,"displayPoints":true}}})
+        viewer.restoreState({"viewport":{"name":"",
+            "eye":[-59.98,134.50,112.6],"target":[8.07,-7.13,8.1398],"up":[0.24,-0.5,0.8],"worldUpVector":[0,0,1],
+            "pivotPoint":[-14.72,9.216,15.333],"distanceToOrbit":164.2,
+            "aspectRatio":1.82,"projection":"perspective","isOrthographic":false,"fieldOfView":49.2}
+        });
     }
 }
 window.addEventListener('DOMContentLoaded', ()=>
     loadModels([
         { urn: "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTIvcnN0X2Jhc2ljX3NhbXBsZV9wcm9qZWN0LnJ2dA", xform: {x:-60,y:0,z:0} },
         { urn: "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTIvNDMyJTIwTmFwYS5ydnQ", xform: {x:60,y:0,z:0} },
-        { urn: "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTEvcmFjLnJ2dA", xform: {x:50,y:0,z:-50} },
-        { urn: "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTEvcmFjLnJ2dA", xform: {x:-50,y:0,z:-50} },
+        { urn: "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTEvcmFjLnJ2dA", xform: {x:50,y:0,z:50} },
+        { urn: "dXJuOmFkc2sub2JqZWN0czpvcy5vYmplY3Q6dnJwYXJ0eTEvcmFjLnJ2dA", xform: {x:-50,y:0,z:50} },
         ])
 );
 
